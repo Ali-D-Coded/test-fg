@@ -1,28 +1,27 @@
 package main
 
 import (
-	"fmt"
+	"log"
+	"os"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
-	fmt.Println("Hello World")
+    app := fiber.New()
 
-	
-	api := gin.Default()
+    app.Get("/", func (c *fiber.Ctx) error {
+        return c.SendString("Hello, World!")
+    })
+    app.Get("/env", func (c *fiber.Ctx) error {
+        return c.SendString("Hello, Env: " + os.Getenv("TEST_ENV") )
+    })
 
-	api.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message":"Hello World",
-		})
-	})
-	api.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message":"pong",
-		})
-	})
+	port := os.Getenv("PORT")
 
-	api.Run("0.0.0.0:8000")
+	if port == "" {
+		port = "3000"
+	}
 
+    log.Fatal(app.Listen("0.0.0.0:" + port))
 }
